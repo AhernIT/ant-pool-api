@@ -15,8 +15,8 @@ module Ant
 
     def initialize(username, apikey, secret)
       self.username = username
-      self.api_key = apikey
-      self.api_secret = secret
+      self.apikey = apikey
+      self.secret = secret
     end
 
     def api_call(method, params = {}, priv = false, is_json = true)

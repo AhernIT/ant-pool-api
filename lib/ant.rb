@@ -11,32 +11,31 @@ require 'rest-client'
 module Ant
 
   class API
-    attr_accessor :apikey, :username, :nonce_v, :secret
+    attr_accessor :api_key, :username, :nonce_v, :api_secret
 
-    def initialize(username, apikey, secret)
+    def initialize(username, api_key, api_secret)
       self.username = username
-      self.apikey = apikey
-      self.secret = secret
+      self.api_key = api_key
+      self.api_secret = api_secret
     end
 
-    def api_call(method, params = {}, priv = false, is_json = true)
+    def api_call(method, param = {}, priv = false, is_json = true)
       url = "https://www.antpool.com/api/#{ method }"
       if priv
-        self.nonce_v
-        params.merge!(:key => self.apikey, :signature => self.signature.to_s.upcase, :nonce => self.nonce_v)
+        self.nonce
+        param.merge!(:key => self.api_key, :signature => self.signature.to_s.upcase, :nonce => self.nonce_v)
       end
-      response = self.post(url, params)
+      answer = self.post(url, param)
 
       # unfortunately, the API does not always respond with JSON, so we must only
       # parse as JSON if is_json is true.
       if is_json
-        JSON.parse(response)
+        JSON.parse(answer)
       else
-        response
+        answer
       end
     end
 
-    # Endpoints
     def account
       self.api_call('account.htm', {}, true)
     end
@@ -46,11 +45,11 @@ module Ant
     end
 
     def pool_stats
-      self.api_call('poolStats.htm')
+      self.api_call('poolStats.htm', {}, true)
     end
 
     def workers
-      self.api_call('workers.htm')
+      self.api_call('workers.htm', {}, true)
     end
 
     def nonce
@@ -58,11 +57,11 @@ module Ant
     end
 
     def signature
-      str = self.username + self.apikey + self.nonce_v
-      OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), self.secret ,str)
+      str = self.username + self.api_key + self.nonce_v
+      OpenSSL::HMAC.hexdigest(OpenSSL::Digest::Digest.new('sha256'), self.api_secret ,str)
     end
 
-    def post(url, params)
+    def post(url, param)
       # 由于服务器采用不安全openssl
       # uri = URI.parse(url)
       # https = Net::HTTP.new(uri.host, uri.port)
@@ -70,7 +69,7 @@ module Ant
       # params = Addressable::URI.new
       # params.query_values = param
       # https.post(uri.path, params.query).body
-      RestClient.post(url, params)
+      RestClient.post(url, param)
     end
   end
 end

@@ -53,8 +53,6 @@ module Ant
       self.api_call('workers.htm')
     end
 
-    private
-
     def nonce
       self.nonce_v = (Time.now.to_f * 1000000).to_i.to_s
     end

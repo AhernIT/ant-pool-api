@@ -22,7 +22,7 @@ module Ant
     def api_call(method, params = {}, priv = false, is_json = true)
       url = "https://www.antpool.com/api/#{ method }"
       if priv
-        self.nonce
+        self.nonce_v
         params.merge!(:key => self.apikey, :signature => self.signature.to_s.upcase, :nonce => self.nonce_v)
       end
       response = self.post(url, params)
